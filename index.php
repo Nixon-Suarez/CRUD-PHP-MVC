@@ -1,5 +1,6 @@
 <?php
     require_once "./config/app.php";
+    require_once "./app/view/inc/session_start.php";
     require_once "autoload.php";
 
     if(isset($_GET['views'])){
