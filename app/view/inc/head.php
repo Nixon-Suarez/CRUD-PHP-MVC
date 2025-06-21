@@ -5,3 +5,5 @@
 </head>
 <link rel="stylesheet" href="<?php echo APP_URL;?>app/view/css/estilos.css">
 <link rel="stylesheet" href="<?php echo APP_URL;?>app/view/css/bulma.min.css">
+<link rel="stylesheet" href="<?php echo APP_URL;?>app/view/css/sweetalert2.min.css">
+<script src="<?php echo APP_URL;?>app/view/js/sweetalert2.all.min.js"></script>
