@@ -3,12 +3,12 @@
     class viewsModel{
         protected function obtenerVistasModelo($vistas){
             $listaBlanca = [
-                "dashboard"
+                "dashboard",
             ];
 
             if(in_array($vistas, $listaBlanca)) {
-                if (is_file("./app/views/content/{$vistas}_view.php")) {
-                    $contenido = "./app/views/content/{$vistas}_view.php";
+                if (is_file("./app/view/content/{$vistas}_view.php")) {
+                    $contenido = "./app/view/content/{$vistas}_view.php";
                 }else {
                     $contenido = "404";
                 }
