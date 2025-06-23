@@ -3,8 +3,8 @@
     require_once "./app/view/inc/session_start.php";
     require_once "autoload.php";
 
-    if(isset($_GET['views'])){
-        $url = explode("/",$_GET['views']); # explode -> splits a string usinga a delimiter
+    if(isset($_GET['view'])){
+        $url = explode("/",$_GET['view']); # explode -> splits a string usinga a delimiter
     }else{
         $url=["login"];
     }
@@ -15,6 +15,18 @@
     <?php require_once "./app/view/inc/head.php";?>
 </head>
 <body>
-    <?php require_once "./app/view/inc/script.php";?>
+    <?php
+        use app\controllers\viewsController;
+
+        $viewsController= new viewsController();
+        $vista=$viewsController->obtenerVistasControlador($url[0]);
+        if($vista=="login" || $vista=="404"){
+            require_once "./app/view/content/".$vista."_view.php";
+        }else{
+            require_once "./app/view/inc/navbar.php";
+            require_once $vista;
+        }
+        require_once "./app/view/inc/script.php";
+    ?>
 </body>
 </html>
