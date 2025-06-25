@@ -23,16 +23,23 @@
             return $sql;
         }
 
-        public function limpiar_cadena($cadena){
-        $palabras = ["<script>", "</script>", "<script src>", "<script type=", "SELECT * FROM",  "DELETE FROM",  "INSERT INTO",  "DROP TABLE",  "DROP DATABASE", "TRUNCATE TABLA",   "SHOW TABLES;", "SHOW DATABASE;", "<?php", "?>", "--", "^", "<", ">", "[", "]", "==", ";", "::"];
-        $cadena = trim($cadena); //quita espacios en blanco
-        $cadena = stripslashes($cadena); //quita barras invertidas
-        foreach ($palabras as $palabra) {
-            $cadena = str_ireplace($palabra, "", $cadena); //reemplaza las palabras prohibidas por "" y lo guarda en $cadena
+        public function limpiarCadena($cadena){
+            $palabras = ["<script>", "</script>", "<script src>", "<script type=", "SELECT * FROM",  "DELETE FROM",  "INSERT INTO",  "DROP TABLE",  "DROP DATABASE", "TRUNCATE TABLA",   "SHOW TABLES;", "SHOW DATABASE;", "<?php", "?>", "--", "^", "<", ">", "[", "]", "==", ";", "::"];
+            $cadena = trim($cadena); //quita espacios en blanco
+            $cadena = stripslashes($cadena); //quita barras invertidas
+            foreach ($palabras as $palabra) {
+                $cadena = str_ireplace($palabra, "", $cadena); //reemplaza las palabras prohibidas por "" y lo guarda en $cadena
+            }
+            $cadena = trim($cadena);
+            $cadena = stripslashes($cadena);
+            $cadena = htmlspecialchars($cadena); //convierte caracteres especiales en entidades HTML
+            return $cadena;
         }
-        $cadena = trim($cadena);
-        $cadena = stripslashes($cadena);
-        $cadena = htmlspecialchars($cadena); //convierte caracteres especiales en entidades HTML
-        return $cadena;
-    }
+        protected function verificarDatos($filtro, $cadena){
+            if(preg_match("/^".$filtro."$/", $cadena)){
+                return false; //si no coincide con el filtro devuelve false
+            }else{
+                return true; //si coincide con el filtro devuelve true
+            }
+        }
     }
