@@ -84,4 +84,20 @@
             $query->execute(); 
             return $query; //retorna el resultado de la consulta
         }
+
+        public function seleccionarDatos($tipo, $tabla, $campo, $id){
+            $tipo = $this->limpiarCadena($tipo);
+            $tabla = $this->limpiarCadena($tabla);
+            $campo = $this->limpiarCadena($campo);
+            $id = $this->limpiarCadena($id);
+
+            if($tipo == "Unico"){
+                $sql = $this->conexion()->prepare("SELECT * FROM $tabla WHERE $campo=:id");
+                $sql->bindParam(":id", $id);
+            }elseif($tipo == "Normal"){
+                $sql = $this->conexion()->prepare("SELECT $campo FROM $tabla");
+            }
+            $sql->execute();
+            return $sql;
+        }
     }
