@@ -42,4 +42,46 @@
                 return true; //si coincide con el filtro devuelve true
             }
         }
+
+        protected function guardarDatos($tabla, $datos){
+            # INSERTANDO LOS DATOS A LA BASE DE DATOS
+            $sql ="INSERT INTO $tabla (";
+            $Contador = 0;
+            foreach($datos as $clave){
+                if($Contador>=1){
+                    $sql .= ",";
+                }
+                $sql .= $clave["campo_nombre"]; //agrega el nombre de la columna
+                $Contador++;
+            }
+
+            $sql = ") VALUES (";
+
+            $Contador = 0;
+            foreach($datos as $clave){
+                if($Contador>=1 && $Contador < count($datos) - 1){
+                    $sql .= ",";
+                }
+                $sql .= $clave["campo_marcador"]; //agrega el nombre de la columna
+                $Contador++;
+            }
+            foreach($datos as $clave){
+                if($Contador>=1 && $Contador < count($datos) - 1){
+                    $sql .= ",";
+                }
+                $sql .= $clave["campo_marcador"]; //agrega el nombre de la columna
+                $Contador++;
+            }
+
+            $sql .= ")";
+
+            $query = $this->conexion()->prepare($sql);
+
+            foreach($datos as $clave){
+                #                                ⬇️NOMBRE DEL MARCADOR            ⬇️Valor real
+                $query->bindParam($clave["campo_marcador"], $clave["campo_valor"]); //bindParam -> Método que vincula o sustituye de la consulta SQL un marcador (:name) con el valor real de una variable PHP
+            }
+            $query->execute(); 
+            return $query; //retorna el resultado de la consulta
+        }
     }
