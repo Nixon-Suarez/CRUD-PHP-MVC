@@ -100,4 +100,24 @@
             $sql->execute();
             return $sql;
         }
+
+        protected function actualizarDatos($tabla, $datos, $condicion){
+            $sql = "UPDATE $tabla SET ";
+            $Contador = 0;
+            foreach($datos as $clave){
+                if($Contador>=1 && $Contador < count($datos) - 1){
+                    $sql .= ",";
+                }
+                $sql .= $clave["campo_nombre"]."=".$clave["campo_marcador"]; //agrega el nombre de la columna
+                $Contador++;
+            }
+            $sql = " WHERE ".$condicion["condicion_campo"]."=".$condicion["condicion_marcador"]; //agrega la condicion de la consulta
+            $query = $this->conexion()->prepare($sql);
+            foreach($datos as $clave){
+                $query->bindParam($clave["campo_marcador"], $clave["campo_valor"]);
+            }
+            $query->bindParam($clave["condicion_marcador"], $clave["condicion_valor"]);
+            $query->execute(); 
+            return $query;
+        }
     }
