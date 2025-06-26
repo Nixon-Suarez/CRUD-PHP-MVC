@@ -17,34 +17,31 @@ formulario_ajax.forEach(formularios => {
             cancelButtonText: "cancelar"
         }).then((result) => {
             if (result.isConfirmed) {
-                
+                // si se le da aceptar a la alerta 
+                let data = new FormData(this); // crea un array en base a la informacion del formulario (this hace referencia al formulario que se esta enviando)
+                let method = this.getAttribute("method"); //obtine el method del formulario
+                let action = this.getAttribute("action"); //obtine el action del formulario
+
+                let encabezados = new Headers(); //crea un nuevo encabezado es obligatorio para el fetch
+
+                let config = {
+                    method: method,
+                    headers: encabezados,
+                    mode: 'cors',
+                    cache: 'no-cache',
+                    body: data
+                };
+
+                fetch(action, config) // el primer parametro es la url del formulario(a donde se envia el formulario) y el segundo parametro es la configuracion del fetch
+                .then(respuesta => respuesta.json()) // la respuesta del archivo Carga la convierte en json
+                .then(respuesta => {  
+                    return alertas_ajax(respuesta); // llama a la funcion alertas_ajax que se encarga de mostrar la alerta
+                });
             }
         });
-        
-
-        // // si se le da aceptar a la alerta 
-        // if(enviar==true){
-
-        //     let data = new FormData(this); // crea un array en base a la informacion del formulario
-        //     let method = this.getAttribute("method"); //obtine el method del formulario
-        //     let action = this.getAttribute("action"); //obtine el action(URL) del formulario
-
-        //     let encabezados = new Headers(); //crea un nuevo encabezado
-
-        //     let config = {
-        //         method: method,
-        //         headers: encabezados,
-        //         mode: 'cors',
-        //         cache: 'no-cache',
-        //         body: data
-        //     };
-
-        //     fetch(action, config)
-        //     .then(respuesta => respuesta.text()) // la respuesta del archivo Carga la convierte en texto
-        //     .then(respuesta => {  
-        //         let contenedor = document.querySelector(".form-rest"); //selecciona el contenedor(elementoHTML) donde se mostrara la respuesta en este caso es un div que va a tener esa clase
-        //         contenedor.innerHTML = respuesta; //muestra la respuesta en el contenedor
-        //     });
-        // }
     });
 });
+
+function alertas_ajax(alerta){
+
+}
