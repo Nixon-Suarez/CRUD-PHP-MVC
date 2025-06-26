@@ -120,4 +120,11 @@
             $query->execute(); 
             return $query;
         }
+
+        protected function eliminarDatos($tabla, $campo, $id){
+            $sql = $this->conexion()->prepare("DELETE FROM $tabla WHERE $campo=:id");
+            $sql->bindParam(":id", $id);
+            $sql->execute();
+            return $sql; 
+        }
     }
