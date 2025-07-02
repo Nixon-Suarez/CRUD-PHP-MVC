@@ -4,6 +4,11 @@
         protected function obtenerVistasModelo($vistas){
             $listaBlanca = [
                 "dashboard",
+                "userNew",
+                "userList",
+                "userSearch",
+                "userUpdate",
+                "userPhoto"
             ];
 
             if(in_array($vistas, $listaBlanca)) {

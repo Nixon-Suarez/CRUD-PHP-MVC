@@ -18,18 +18,18 @@
             </a>
 
             <div class="navbar-item has-dropdown is-hoverable">
-                <a class="navbar-link" href="#">
+                <a class="navbar-link" href="<?php echo APP_URL;?>?view=userUpdate/">
                     Usuarios
                 </a>
                 <div class="navbar-dropdown is-boxed">
 
-                    <a class="navbar-item" href="#">
+                    <a class="navbar-item" href="<?php echo APP_URL;?>?view=userNew/">
                         Nuevo
                     </a>
-                    <a class="navbar-item" href="#">
+                    <a class="navbar-item" href="<?php echo APP_URL;?>?view=userList">
                         Lista
                     </a>
-                    <a class="navbar-item" href="#">
+                    <a class="navbar-item" href="<?php echo APP_URL;?>?view=userSearch">
                         Buscar
                     </a>
 
@@ -44,10 +44,10 @@
                 </a>
                 <div class="navbar-dropdown is-boxed">
 
-                    <a class="navbar-item" href="#">
+                    <a class="navbar-item" href="<?php echo APP_URL;?>?view=userUpdate/">
                         Mi cuenta
                     </a>
-                    <a class="navbar-item" href="#">
+                    <a class="navbar-item" href="<?php echo APP_URL;?>?view=userPhoto/">
                         Mi foto
                     </a>
                     <hr class="navbar-divider">
