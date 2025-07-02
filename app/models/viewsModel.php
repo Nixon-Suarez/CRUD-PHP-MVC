@@ -17,9 +17,9 @@
                 }else {
                     $contenido = "404";
                 }
-            } elseif ($vistas == "login" || $vistas == "index") {
+            }elseif ($vistas == "login" || $vistas == "index") {
                 $contenido = "login";
-            } else{
+            }else{
                 $contenido = "404";
             }
             return $contenido;
