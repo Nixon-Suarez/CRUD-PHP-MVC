@@ -5,10 +5,10 @@
         require_once __DIR__."/../../config/server.php";
     }
     class mainModel{
-        private $server = DB_SERVER;
-        private $db = DB_NAME;
-        private $user = DB_USER;
-        private $pass = DB_PASS;
+        private $server = "localhost";
+        private $db = "mvc";
+        private $user = "root";
+        private $pass = "";
 
         // conexion BD
         protected function conexion(){
@@ -55,18 +55,11 @@
                 $Contador++;
             }
 
-            $sql = ") VALUES (";
+            $sql .= ") VALUES (";
 
             $Contador = 0;
             foreach($datos as $clave){
-                if($Contador>=1 && $Contador < count($datos) - 1){
-                    $sql .= ",";
-                }
-                $sql .= $clave["campo_marcador"]; //agrega el nombre de la columna
-                $Contador++;
-            }
-            foreach($datos as $clave){
-                if($Contador>=1 && $Contador < count($datos) - 1){
+                if($Contador>=1){
                     $sql .= ",";
                 }
                 $sql .= $clave["campo_marcador"]; //agrega el nombre de la columna
@@ -91,10 +84,10 @@
             $campo = $this->limpiarCadena($campo);
             $id = $this->limpiarCadena($id);
 
-            if($tipo == "Unico"){
+            if($tipo == "Normal"){
                 $sql = $this->conexion()->prepare("SELECT * FROM $tabla WHERE $campo=:id");
                 $sql->bindParam(":id", $id);
-            }elseif($tipo == "Normal"){
+            }elseif($tipo == "Unico"){
                 $sql = $this->conexion()->prepare("SELECT $campo FROM $tabla");
             }
             $sql->execute();
