@@ -8,7 +8,8 @@
                 "userList",
                 "userSearch",
                 "userUpdate",
-                "userPhoto"
+                "userPhoto",
+                "logout"
             ];
 
             if(in_array($vistas, $listaBlanca)) {

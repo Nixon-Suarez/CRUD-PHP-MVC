@@ -24,11 +24,9 @@
         <p class="has-text-centered mb-4 mt-3">
             <button type="submit" class="button is-info is-rounded">Iniciar sesion</button>
         </p>
-
         <?php
             if(isset($_POST['login_usuario']) && isset($_POST['login_clave'])){ #si el post de login_usuario y el login_clave traen datos 
-                require_once "./php/main.php";
-                require_once "./php/iniciar_sesion.php"; 
+                $insLogin->iniciarSesionControlador();
             }
         ?>
     </form>

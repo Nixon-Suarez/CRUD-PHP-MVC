@@ -51,7 +51,7 @@
                         Mi foto
                     </a>
                     <hr class="navbar-divider">
-                    <a class="navbar-item" href="#" id="btn_exit" >
+                    <a class="navbar-item" href="<?php echo APP_URL;?>?view=logout/" id="btn_exit" >
                         Salir
                     </a>
 
