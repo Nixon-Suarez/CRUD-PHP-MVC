@@ -26,8 +26,14 @@
         if($vista=="login" || $vista=="404"){
             require_once "./app/view/content/".$vista."_view.php";
         }else{
+            if((!isset($_SESSION['id']) || $_SESSION['id'] == "") || (!isset($_SESSION['usuario']) || $_SESSION['usuario'] == "")){
+                $insLogin->cerrarSesionControlador();
+                exit();
+            }
+            else{
             require_once "./app/view/inc/navbar.php";
             require_once $vista;
+            }
         }
         require_once "./app/view/inc/script.php";
     ?>
