@@ -99,3 +99,25 @@ function alertas_ajax(alerta){
         });
     }
 }
+
+// boton para cerrar session
+let btn_exit=document.getElementById("btn_exit");
+btn_exit.addEventListener("click", function(evento){
+    evento.preventDefault(); // previene el evento por defecto del boton
+    Swal.fire({
+        title: "Quieres cerrar session?",
+        text: "La sesion se cerrara",
+        icon: "question",
+        theme: "dark",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Aceptar",
+        cancelButtonText: "Cancelar"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            let url = this.getAttribute("href"); // obtiene la url del boton
+            window.location.href = url; // redirecciona a la url del boton
+        }
+    });
+});
