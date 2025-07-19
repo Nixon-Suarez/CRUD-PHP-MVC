@@ -26,6 +26,7 @@
         if($vista=="login" || $vista=="404"){
             require_once "./app/view/content/".$vista."_view.php";
         }else{
+            // si no ha iniciado sesion no permite acceder 
             if((!isset($_SESSION['id']) || $_SESSION['id'] == "") || (!isset($_SESSION['usuario']) || $_SESSION['usuario'] == "")){
                 $insLogin->cerrarSesionControlador();
                 exit();
