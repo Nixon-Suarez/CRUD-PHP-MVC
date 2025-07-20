@@ -258,4 +258,125 @@
             }
             return json_encode($alerta);
         }
+
+        public function listarUsuariosControlador($pagina, $registros, $url, $busqueda){
+            $pagina = $this->limpiarCadena($pagina);
+            $registros = $this->limpiarCadena($registros);
+            $url = $this->limpiarCadena($url);
+            $url= APP_URL ."?view=". $url."/";
+            $busqueda = $this->limpiarCadena($busqueda);
+            $tabla = "";
+            $pagina = (isset($pagina) && $pagina>0) ? (int)$pagina : 1;
+            $inicio = ($pagina>0) ? (($registros * $pagina) - $registros) : 0; #ej existen 30 registros y se muestran 10 por pagina, entonces si la pagina es 1, el inicio es 0, si la pagina es 2, el inicio es 10, etc.
+            if(isset($busqueda) && $busqueda != ""){ # si la variable busqueda no esta vacia  Genera la consulta que treaera los usuarios y el total de usuarios
+                $consulta_datos = "SELECT * FROM usuario 
+                                WHERE 
+                                    ((usuario_id != ".$_SESSION['id']." AND usuario_id != '1') 
+                                    AND (usuario_nombre LIKE '%$busqueda%' OR usuario_apellido LIKE '%$busqueda%' OR usuario_email LIKE '%$busqueda%' OR usuario_usuario LIKE '%$busqueda%'))
+                                ORDER BY usuario_nombre ASC LIMIT $inicio,$registros;";
+
+                $consulta_total = "SELECT COUNT(usuario_id) FROM usuario 
+                                WHERE 
+                                    ((usuario_id != ".$_SESSION['id']." AND usuario_id != '1') 
+                                    AND (usuario_nombre LIKE '%$busqueda%' OR usuario_apellido LIKE '%$busqueda%' OR usuario_email LIKE '%$busqueda%' OR usuario_usuario LIKE '%$busqueda%'))
+                                ORDER BY usuario_nombre ASC LIMIT $inicio,$registros;";
+
+            }else{
+                $consulta_datos = "SELECT * FROM usuario WHERE usuario_id != ".$_SESSION['id']." AND usuario_id != '1' ORDER BY usuario_nombre ASC LIMIT $inicio,$registros;";
+
+                $consulta_total = "SELECT COUNT(usuario_id) FROM usuario WHERE usuario_id != ".$_SESSION['id']." AND usuario_id != '1';";
+            }
+
+            $datos = $this->ejecutarConsulta($consulta_datos); #ejecutamos la consulta de los datos
+            $datos = $datos->fetchAll(); #fetchAll() devuelve todos los registros de la consulta en un array asociativo
+            $total = $this->ejecutarConsulta($consulta_total); #ejecutamos la consulta del total de registros
+            $total = (int) $total->fetchColumn(); #fetchColumn() devuelve el valor de la primera columna de la primera fila del resultado de la consulta
+
+            $numeroPaginas = ceil($total / $registros); #ceil redondea hacia arriba
+            # abrimos la tabla 
+            $tabla .= ' 
+                <div class="table-container">
+                    <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
+                        <thead>
+                            <tr>
+		                        <th class="has-text-centered">#</th>
+		                        <th class="has-text-centered">Nombre</th>
+		                        <th class="has-text-centered">Usuario</th>
+		                        <th class="has-text-centered">Email</th>
+		                        <th class="has-text-centered">Creado</th>
+		                        <th class="has-text-centered">Actualizado</th>
+		                        <th class="has-text-centered" colspan="3">Opciones</th>
+		                    </tr>
+                        </thead>
+                        <tbody>
+            ';
+
+            if($total>=1 && $pagina<=$numeroPaginas){
+				$contador=$inicio+1;
+				$pag_inicio=$inicio+1;
+				foreach($datos as $rows){
+					$tabla.='
+						<tr class="has-text-centered" >
+							<td>'.$contador.'</td>
+							<td>'.$rows['usuario_nombre'].' '.$rows['usuario_apellido'].'</td>
+							<td>'.$rows['usuario_usuario'].'</td>
+							<td>'.$rows['usuario_email'].'</td>
+							<td>'.date("d-m-Y  h:i:s A",strtotime($rows['usuario_creado'])).'</td>
+							<td>'.date("d-m-Y  h:i:s A",strtotime($rows['usuario_actualizado'])).'</td>
+							<td>
+			                    <a href="'.APP_URL.'?view=userPhoto/'.$rows['usuario_id'].'/" class="button is-info is-rounded is-small">Foto</a>
+			                </td>
+			                <td>
+			                    <a href="'.APP_URL.'?view=userUpdate/'.$rows['usuario_id'].'/" class="button is-success is-rounded is-small">Actualizar</a>
+			                </td>
+			                <td>
+			                	<form class="FormularioAjax" action="'.APP_URL.'app/ajax/usuarioAjax.php" method="POST" autocomplete="off" >
+
+			                		<input type="hidden" name="modulo_usuario" value="eliminar">
+			                		<input type="hidden" name="usuario_id" value="'.$rows['usuario_id'].'">
+
+			                    	<button type="submit" class="button is-danger is-rounded is-small">Eliminar</button>
+			                    </form>
+			                </td>
+						</tr>
+					';
+					$contador++;
+				}
+				$pag_final=$contador-1;
+			}else{
+                if($total>=1){
+					$tabla.='
+						<tr class="has-text-centered" >
+			                <td colspan="7">
+			                    <a href="'.$url.'1/" class="button is-link is-rounded is-small mt-4 mb-4">
+			                        Haga clic acá para recargar el listado
+			                    </a>
+			                </td>
+			            </tr>
+					';
+				}else{
+					$tabla.='
+						<tr class="has-text-centered" >
+			                <td colspan="7">
+			                    No hay registros en el sistema
+			                </td>
+			            </tr>
+					';
+				}
+			}
+
+            $tabla .= '
+                        </tbody>
+                    </table>
+                </div>
+            ';
+
+            #si hay registros y la pagina es menor o igual a la cantidad de paginas mostramos los numeros de la paginacion
+            if($total>0 && $pagina<=$numeroPaginas){
+				$tabla.='<p class="has-text-right">Mostrando usuarios <strong>'.$pag_inicio.'</strong> al <strong>'.$pag_final.'</strong> de un <strong>total de '.$total.'</strong></p>';
+
+				$tabla.=$this->paginadorTablas($pagina,$numeroPaginas,$url,7);
+			}
+            return $tabla;
+        }
     }
