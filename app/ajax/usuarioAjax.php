@@ -9,6 +9,9 @@
         if($_POST['modulo_usuario'] == "registrar"){
             echo $insUsuario->registrarUsuarioControlador();
         }
+        if($_POST['modulo_usuario'] == "eliminar"){
+            echo $insUsuario->eliminarUsuarioControlador();
+        }
     }else{
         session_destroy();
         header("Location: ".APP_URL."login.php/");
