@@ -84,10 +84,10 @@
             $campo = $this->limpiarCadena($campo);
             $id = $this->limpiarCadena($id);
 
-            if($tipo == "Normal"){
+            if($tipo == "Unico"){
                 $sql = $this->conexion()->prepare("SELECT * FROM $tabla WHERE $campo=:id");
                 $sql->bindParam(":id", $id);
-            }elseif($tipo == "Unico"){
+            }elseif($tipo == "Normal"){
                 $sql = $this->conexion()->prepare("SELECT $campo FROM $tabla");
             }
             $sql->execute();
@@ -98,18 +98,18 @@
             $sql = "UPDATE $tabla SET ";
             $Contador = 0;
             foreach($datos as $clave){
-                if($Contador>=1 && $Contador < count($datos) - 1){
+                if($Contador>=1){
                     $sql .= ",";
                 }
                 $sql .= $clave["campo_nombre"]."=".$clave["campo_marcador"]; //agrega el nombre de la columna
                 $Contador++;
             }
-            $sql = " WHERE ".$condicion["condicion_campo"]."=".$condicion["condicion_marcador"]; //agrega la condicion de la consulta
+            $sql .= " WHERE ".$condicion["condicion_campo"]."=".$condicion["condicion_marcador"]; //agrega la condicion de la consulta
             $query = $this->conexion()->prepare($sql);
             foreach($datos as $clave){
                 $query->bindParam($clave["campo_marcador"], $clave["campo_valor"]);
             }
-            $query->bindParam($clave["condicion_marcador"], $clave["condicion_valor"]);
+            $query->bindParam($condicion["condicion_marcador"], $condicion["condicion_valor"]);
             $query->execute(); 
             return $query;
         }
