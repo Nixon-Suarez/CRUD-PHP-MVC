@@ -15,6 +15,12 @@
         if($_POST['modulo_usuario'] == "actualizar"){
             echo $insUsuario->actualizarUsuarioControlador();
         }
+        if($_POST['modulo_usuario'] == "actualizarFoto"){
+            echo $insUsuario->actualizarUsuarioFotoControlador();
+        }
+        if($_POST['modulo_usuario'] == "eliminarFoto"){
+            echo $insUsuario->actualizarUsuarioEliminarFotoControlador();
+        }
     }else{
         session_destroy();
         header("Location: ".APP_URL."login.php/");

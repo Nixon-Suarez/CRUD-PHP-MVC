@@ -162,20 +162,20 @@
                 #Extencion del archivo
                 switch(mime_content_type($_FILES['usuario_foto']['tmp_name'])) {
                     case 'image/jpeg':
-                        $img_ext = '.jpg'; // si es un archivo jpg
+                        $foto = '.jpg'; // si es un archivo jpg
                         break;
                     case 'image/png':
-                        $img_ext = '.png'; // si es un archivo png
+                        $foto = '.png'; // si es un archivo png
                         break;
                     case 'image/jpg':
-                        $img_ext = '.jpg'; // si es un archivo jpg
+                        $foto = '.jpg'; // si es un archivo jpg
                         break;
                 }
 
                 chmod($img_dir, 0777); // cambia los permisos del directorio a 0777 osea puede leer, escribir y ejecutar
                 
                 // renombra la foto
-                $foto = str_ireplace(" ", "_", $usuario_nombre) . "_" . rand(100, 999) . $img_ext; // renombra la foto con el nombre del usuario y apellido y un numero aleatorio
+                $foto = str_ireplace(" ", "_", $usuario_nombre) . "_" . rand(100, 999) . $foto; // renombra la foto con el nombre del usuario y apellido y un numero aleatorio
 
                 // mover la img al directorio de imagenes
                 if(!move_uploaded_file($_FILES['usuario_foto']['tmp_name'], $img_dir . $foto)) {
@@ -189,7 +189,7 @@
                     exit();
                 }
             }else{
-                $foto =""; // si no se selecciona una imagen, se deja la variable foto vacia
+                $foto = ""; // si no se selecciona una imagen, se deja la variable foto vacia
             }
 
             $usuario_datos_reg = [
@@ -678,5 +678,153 @@
                 ];
             }
             return json_encode($alerta);
+        }
+
+        public function actualizarUsuarioFotoControlador(){
+            $usuario_id = $this->limpiarCadena($_POST['usuario_id']);
+            $datos = $this->ejecutarConsulta("SELECT * FROM usuario WHERE usuario_id='$usuario_id'");
+            if($datos->rowCount()<=0){
+                $alerta = [
+                    "tipo" => "simple",
+                    "titulo" => "Ocurrio un error inesperado",
+                    "texto" => "No hemos encontrado el usuario en el sistema",
+                    "icono" => "error"
+                ];
+                return json_encode($alerta);
+                exit();
+            }else{
+                $datos = $datos->fetch();
+            }
+            // Directorio de imagenes
+            $img_dir = "../view/fotos/";
+
+            // Validar seleccion de una img
+                        #⬇️nombre del imput
+                                        // ⬇️ATTRIBUTO DEL ARCHIVO en este caso el nombre
+            if($_FILES['usuario_foto']['name'] !="" && $_FILES['usuario_foto']['size']<=0){
+                $alerta=[
+					"tipo"=>"simple",
+					"titulo"=>"Ocurrió un error inesperado",
+					"texto"=>"No ha seleccionado una foto para el usuario",
+					"icono"=>"error"
+				];
+				return json_encode($alerta);
+		        exit();
+            }
+            //  creando directorio si no existe
+            if(!file_exists($img_dir)) { 
+                if(!mkdir($img_dir, 0777)){ #0777 puede leer, escribir y ejecutar
+                    $alerta = [
+                        "tipo" => "simple",
+                        "titulo" => "Ocurrio un error inesperado",
+                        "texto" => "No se pudo crear el directorio",
+                        "icono" => "error"
+                    ];
+                    return json_encode($alerta);
+                    exit();
+                }
+            }
+            // limitar que tipo de archivo esta entrando (se valida con el tipo de mime)
+            if(mime_content_type($_FILES['usuario_foto']['tmp_name']) != "image/jpeg" && mime_content_type($_FILES['usuario_foto']['tmp_name']) != "image/png" && mime_content_type($_FILES['usuario_foto']['tmp_name']) != "image/jpg"){
+                $alerta = [
+                    "tipo" => "simple",
+                    "titulo" => "Ocurrio un error inesperado",
+                    "texto" => "Archivo no permitido, solo se permiten archivos JPG, JPEG y PNG",
+                    "icono" => "error"
+                ];
+                return json_encode($alerta);
+                exit();
+            }
+            # limitar el peso del archivo
+            if (($_FILES['usuario_foto']['size'] / 1024) > 5120) {
+                $alerta = [
+                    "tipo" => "simple",
+                    "titulo" => "Ocurrio un error inesperado",
+                    "texto" => "El archivo no puede pesar mas de 5MB",
+                    "icono" => "error"
+                ];
+                return json_encode($alerta);
+                exit();
+            }
+            
+            if($datos['usuario_foto']!= ""){
+                $foto = explode(".", $datos['usuario_foto']); // separa el nombre de la foto y la extencion
+                $foto = $foto[0]; // toma el nombre de la foto sin la extencion
+            }else{
+                $foto=str_ireplace(" ","_",$datos['usuario_nombre']);
+	            $foto=$foto."_".rand(0,100);
+            }
+            
+            #Extencion del archivo
+            switch(mime_content_type($_FILES['usuario_foto']['tmp_name'])) {
+                case 'image/jpeg':
+                    $foto = $foto.'.jpg'; // si es un archivo jpg
+                    break;
+                case 'image/png':
+                    $foto = $foto.'.png'; // si es un archivo png
+                    break;
+                case 'image/jpg':
+                    $foto = $foto.'.jpg'; // si es un archivo jpg
+                    break;
+            }
+            chmod($img_dir, 0777); // cambia los permisos del directorio a 0777 osea puede leer, escribir y ejecutar
+            // mover la img al directorio de imagenes
+            if(!move_uploaded_file($_FILES['usuario_foto']['tmp_name'], $img_dir . $foto)) {
+                $alerta = [
+                    "tipo" => "simple",
+                    "titulo" => "Ocurrio un error inesperado",
+                    "texto" => "Error al subir el archivo, intente nuevamente",
+                    "icono" => "error"
+                ];
+                return json_encode($alerta);
+                exit();
+            }
+
+            #Eliminar foto anterior
+            if(is_file($img_dir.$datos['usuario_foto'])){ #valida si la img existe en el directorio
+                chmod($img_dir.$datos['usuario_foto'], 0777);
+                unlink($img_dir.$datos['usuario_foto']); #si existe la elimina
+            }
+
+            $usuario_datos_up=[
+				[
+					"campo_nombre"=>"usuario_foto",
+					"campo_marcador"=>":Foto",
+					"campo_valor"=>$foto
+				],
+				[
+					"campo_nombre"=>"usuario_actualizado",
+					"campo_marcador"=>":Actualizado",
+					"campo_valor"=>date("Y-m-d H:i:s")
+				]
+			];
+            $condicion=[
+				"condicion_campo"=>"usuario_id",
+				"condicion_marcador"=>":ID",
+				"condicion_valor"=>$usuario_id
+			];
+            if($this->actualizarDatos("usuario", $usuario_datos_up, $condicion)){ #si los datos se actualizaron
+                if($usuario_id==$_SESSION['id']){ # si el usuario actualizado es el mismo que el que esta logueado
+                    $_SESSION['foto'] = $foto; # actualiza la variable de session foto
+                }
+                $alerta = [
+                    "tipo" => "recargar",
+                    "titulo" => "Foto Actualizado",
+                    "texto" => "El usuario ".$datos['usuario_nombre']." ". $datos['usuario_apellido']." ha sido Actualizado exitosamente",
+                    "icono" => "success"
+                ];
+            }else{
+                $alerta = [
+                    "tipo" => "simple",
+                    "titulo" => "Ocurrio un error inesperado",
+                    "texto" => "No hemos podido actualizar algunos datos del usuario ".$datos['usuario_nombre']." ". $datos['usuario_apellido']." , sin embargo se actualizo la foto",
+                    "icono" => "warning"
+                ];
+            }
+            return json_encode($alerta);
+            }
+
+        public function actualizarUsuarioEliminarFotoControlador(){
+            
         }
     }
