@@ -701,7 +701,7 @@
             // Validar seleccion de una img
                         #⬇️nombre del imput
                                         // ⬇️ATTRIBUTO DEL ARCHIVO en este caso el nombre
-            if($_FILES['usuario_foto']['name'] !="" && $_FILES['usuario_foto']['size']<=0){
+            if(empty($_FILES['usuario_foto']['name']) || $_FILES['usuario_foto']['size'] <= 0){
                 $alerta=[
 					"tipo"=>"simple",
 					"titulo"=>"Ocurrió un error inesperado",
@@ -746,27 +746,26 @@
                 return json_encode($alerta);
                 exit();
             }
-            
-            if($datos['usuario_foto']!= ""){
-                $foto = explode(".", $datos['usuario_foto']); // separa el nombre de la foto y la extencion
-                $foto = $foto[0]; // toma el nombre de la foto sin la extencion
+
+            # Nombre de la foto #
+	        if($datos['usuario_foto']!= ""){
+                $foto = pathinfo($datos['usuario_foto'], PATHINFO_FILENAME);
+                $foto = $foto."_".time();
             }else{
-                $foto=str_ireplace(" ","_",$datos['usuario_nombre']);
-	            $foto=$foto."_".rand(0,100);
+                $foto = str_ireplace(" ","_",$datos['usuario_nombre']);
+                $foto = $foto."_".rand(0,100)."_".time();
             }
             
-            #Extencion del archivo
-            switch(mime_content_type($_FILES['usuario_foto']['tmp_name'])) {
-                case 'image/jpeg':
-                    $foto = $foto.'.jpg'; // si es un archivo jpg
-                    break;
-                case 'image/png':
-                    $foto = $foto.'.png'; // si es un archivo png
-                    break;
-                case 'image/jpg':
-                    $foto = $foto.'.jpg'; // si es un archivo jpg
-                    break;
-            }
+            # Extension de la imagen #
+	        switch(mime_content_type($_FILES['usuario_foto']['tmp_name'])){
+	            case 'image/jpeg':
+	                $foto=$foto.".jpg";
+	            break;
+	            case 'image/png':
+	                $foto=$foto.".png";
+	            break;
+	        }
+
             chmod($img_dir, 0777); // cambia los permisos del directorio a 0777 osea puede leer, escribir y ejecutar
             // mover la img al directorio de imagenes
             if(!move_uploaded_file($_FILES['usuario_foto']['tmp_name'], $img_dir . $foto)) {
@@ -803,7 +802,8 @@
 				"condicion_marcador"=>":ID",
 				"condicion_valor"=>$usuario_id
 			];
-            if($this->actualizarDatos("usuario", $usuario_datos_up, $condicion)){ #si los datos se actualizaron
+            $resultado = $this->actualizarDatos("usuario", $usuario_datos_up, $condicion);
+            if($resultado && $resultado->rowCount() > 0){ #si los datos se actualizaron
                 if($usuario_id==$_SESSION['id']){ # si el usuario actualizado es el mismo que el que esta logueado
                     $_SESSION['foto'] = $foto; # actualiza la variable de session foto
                 }
