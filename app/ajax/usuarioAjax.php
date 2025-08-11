@@ -19,7 +19,7 @@
             echo $insUsuario->actualizarUsuarioFotoControlador();
         }
         if($_POST['modulo_usuario'] == "eliminarFoto"){
-            echo $insUsuario->actualizarUsuarioEliminarFotoControlador();
+            echo $insUsuario->UsuarioEliminarFotoControlador();
         }
     }else{
         session_destroy();

@@ -824,7 +824,82 @@
             return json_encode($alerta);
             }
 
-        public function actualizarUsuarioEliminarFotoControlador(){
-            
+        public function UsuarioEliminarFotoControlador(){
+            $usuario_id = $this->limpiarCadena($_POST['usuario_id']);
+            $datos = $this->ejecutarConsulta("SELECT * FROM usuario WHERE usuario_id='$usuario_id'");
+            if($datos->rowCount()<=0){
+                $alerta = [
+                    "tipo" => "simple",
+                    "titulo" => "Ocurrio un error inesperado",
+                    "texto" => "No hemos encontrado el usuario en el sistema",
+                    "icono" => "error"
+                ];
+                return json_encode($alerta);
+                exit();
+            }else{
+                $datos = $datos->fetch();
+            }
+            // Directorio de imagenes
+            $img_dir = "../view/fotos/";
+            chmod($img_dir, 0777); // cambia los permisos del directorio a 0777 osea puede leer, escribir y ejecutar
+            if(is_file($img_dir.$datos['usuario_foto'])){ #valida si la img existe en el directorio
+                chmod($img_dir.$datos['usuario_foto'], 0777);
+                if(!unlink($img_dir.$datos['usuario_foto'])){ #si existe la elimina
+                    $alerta = [
+                        "tipo" => "simple",
+                        "titulo" => "Ocurrio un erro inesperado",
+                        "texto" => "No hemos podido eliminar la foto del usuario ".$datos['usuario_nombre']." ".$datos['usuario_apellido'].", intente nuevamente",
+                        "icono" => "error"
+                    ];
+                    return json_encode($alerta);
+                    exit();
+                } 
+            }else{
+                $alerta = [
+                    "tipo" => "simple",
+                    "titulo" => "Ocurrio un error inesperado",
+                    "texto" => "No hemos encontrado la foto del usuario en el sistema",
+                    "icono" => "error"
+                ];
+                return json_encode($alerta);
+                exit();
+            }
+            $foto = ""; // si se elimina la foto, se deja la variable foto vacia
+            $usuario_datos_up=[
+				[
+					"campo_nombre"=>"usuario_foto",
+					"campo_marcador"=>":Foto",
+					"campo_valor"=>$foto
+				],
+				[
+					"campo_nombre"=>"usuario_actualizado",
+					"campo_marcador"=>":Actualizado",
+					"campo_valor"=>date("Y-m-d H:i:s")
+				]
+			];
+            $condicion=[
+				"condicion_campo"=>"usuario_id",
+				"condicion_marcador"=>":ID",
+				"condicion_valor"=>$usuario_id
+			];
+            if($this->actualizarDatos("usuario", $usuario_datos_up, $condicion)){ #si los datos se actualizaron
+                if($usuario_id==$_SESSION['id']){ # si el usuario actualizado es el mismo que el que esta logueado
+                    $_SESSION['foto'] = $foto; # actualiza la variable de session foto
+                }
+                $alerta = [
+                    "tipo" => "recargar",
+                    "titulo" => "Foto Eliminado",
+                    "texto" => "El usuario ".$datos['usuario_nombre']." ". $datos['usuario_apellido']." ha sido eliminada exitosamente",
+                    "icono" => "success"
+                ];
+            }else{
+                $alerta = [
+                    "tipo" => "simple",
+                    "titulo" => "Ocurrio un error inesperado",
+                    "texto" => "No hemos podido actualizar algunos datos del usuario ".$datos['usuario_nombre']." ". $datos['usuario_apellido']." , sin embargo se a eliminado la foto",
+                    "icono" => "warning"
+                ];
+            }
+            return json_encode($alerta);
         }
     }
